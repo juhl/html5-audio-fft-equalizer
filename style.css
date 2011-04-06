@@ -1,0 +1,47 @@
+html, body {
+  margin:0px 0px; padding:0px;
+  text-align:center;
+}
+div#content {
+  margin: 0px auto;
+  text-align: center;
+  vertical-align: middle;
+}
+div#screen {
+  margin: 0px auto;
+  border: 0px solid black;
+  padding: 4px;
+  background-color: white;
+}
+.slider { 
+  margin: 10px; 
+  display: inline-block; 
+  vertical-align: top;
+}
+div#info {
+  margin: 16px auto;
+  padding: 10px;
+  width: 400px;
+  text-align: left;
+  background-color: #eeeeee;
+  -webkit-border-radius: .4em;
+  -moz-border-radius: .4em;
+  border-radius: .4em;
+}
+header {
+  padding-top: 0px;
+  text-align: center;
+  line-height: 1.5;
+  font: 20pt 'Lucidia Grande', 'Lucidia Sans Unicode';
+  text-shadow: 1px 1px 2px #222;
+}
+body {
+  font: 11pt 'Arial', 'Lucidia Sans Unicode';
+}
+footer {
+  padding-top: 0px;
+  text-align: center;
+  line-height: 1.5;
+  font: 9pt 'Lucidia Grande', 'Lucidia Sans Unicode';
+  color: #404040;
+}
