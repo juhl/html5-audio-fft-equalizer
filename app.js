@@ -14,7 +14,7 @@ App = function() {
     var fft_re = [];
     var fft_im = [];
     var eq = [];
-	var canvas;
+    var canvas;
     var ctx;
     var fft;
 
@@ -173,12 +173,12 @@ App = function() {
     }
 
     function eqScale(x) {
-        var sx = x * EQ_COUNT - 0.5 / EQ_COUNT;
+        var sx = x * EQ_COUNT - 0.5;
         sx = Math.min(Math.max(sx, 0), EQ_COUNT - 1);
         var i0 = Math.floor(sx);
         var i1 = Math.min(i0 + 1, EQ_COUNT - 1);
-        var fraction = (sx - i0) * EQ_COUNT;
-        var ret = eq[i1] * fraction + eq[i0] * (1 - fraction);
+        var fraction = sx - i0;
+        var ret = eq[i1] * (fraction) + eq[i0] * (1 - fraction);
         return ret;
     }
 
@@ -219,8 +219,9 @@ App = function() {
                 fft.forward(target_buffers[i], channels, j, fft_re[j], fft_im[j]);
 
                 for (var k = 0; k < fft.bufferSize; k++) {
-                    fft_re[j][k] *= eqScale(k / fft.bufferSize);
-                    fft_im[j][k] *= eqScale(k / fft.bufferSize);
+                    var x = 1 - Math.abs(2 * k / fft.bufferSize - 1);
+                    fft_re[j][k] *= eqScale(x);
+                    fft_im[j][k] *= eqScale(x);
                 }
             }
 
@@ -267,9 +268,9 @@ App = function() {
                 for (var k = 0; k < 4; k++) {
                     spectrum += Math.sqrt(re[i + k] * re[i + k] + im[i + k] * im[i + k]);
                 }
-
                 spectrum /= 4;
             }
+
             spectrum /= channels;
             spectrum *= scale;
             magnitude = spectrum * 256;
