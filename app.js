@@ -309,7 +309,7 @@ App = function() {
         }
     }
 
-	function main() {
+    function main() {
         i_audio = document.getElementById("audio");
         i_audio.addEventListener('loadedmetadata', loadedMetadata, false);
         o_audio = new Audio();
@@ -325,13 +325,13 @@ App = function() {
             }(i);
         }
 
-		canvas = document.getElementById("spectrum");
-		if (!canvas.getContext) {
-			alert("Couldn't get canvas object !");
-		}
+        canvas = document.getElementById("spectrum");
+        if (!canvas.getContext) {
+		    alert("Couldn't get canvas object !");
+	    }
 
 	    ctx = canvas.getContext("2d");
-	}
+    }
 
-	return { main: main };
+    return { main: main };
 }();
