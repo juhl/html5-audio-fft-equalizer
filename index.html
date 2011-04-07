@@ -23,8 +23,28 @@
         feature works only on <a href="www.mozila.com/firefox">FireFox 4</a>.
       </div>
 
+      <audio id="audio" src="Professor Kliq - Plastic Flashing Lights.ogg" controls="true" style="width:386px;">
+      </audio>
+
       <div id="screen">
         <canvas width="512" height="256" id="spectrum">
+      </div>
+
+      <div>
+        <select id="combobox-equalizer">
+          <option value="0" selected="selected">Manual</option>
+          <optgroup label="Preset">
+            <option value="1">Acoustic</option>
+            <option value="2">Base Booster</option>
+            <option value="3">Electronic</option>
+            <option value="4">Flat</option>
+            <option value="5">Jazz</option>
+            <option value="6">Pop</option>
+            <option value="7">Rock</option>
+            <option value="8">Small Speakers</option>
+            <option value="9">Vocal Booster</option>
+          </optgroup>
+        </select>
       </div>
 
       <div id="equalizer">
@@ -39,9 +59,6 @@
         <div id="slider8" class="slider"></div>
         <div id="slider9" class="slider"></div>
       </div>
-
-      <audio id="audio" src="Professor Kliq - Plastic Flashing Lights.ogg" controls="true" style="width:386px; height:32px">
-      </audio>
 
     </div>
   </div>
