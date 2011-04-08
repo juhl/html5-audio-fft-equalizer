@@ -160,7 +160,6 @@ App = function() {
                 for (var k = 0; k < 4; k++) {
                     spectrum += Math.sqrt(re[i + k] * re[i + k] + im[i + k] * im[i + k]);
                 }
-                spectrum += Math.sqrt(re[i] * re[i] + im[i] * im[i]);
                 spectrum /= 4;
             }
 
