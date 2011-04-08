@@ -81,12 +81,12 @@ App = function() {
 
                 fft.forward(target_buffers[i], channels, j, fft_re[j], fft_im[j]);
 
-                for (var k = 0; k < fft.bufferSize / 2; k++) {
-                    var f = eq_filter(k / (fft.bufferSize - 1));
+                for (var k = 1; k < fft.bufferSize / 2; k++) {
+                    var f = eq_filter((k - 1) / (fft.bufferSize - 1));
                     fft_re[j][k] *= f;
                     fft_im[j][k] *= f;
-                    fft_re[j][fft.bufferSize - 1 - k] *= f;
-                    fft_im[j][fft.bufferSize - 1 - k] *= f;
+                    fft_re[j][fft.bufferSize - k] *= f;
+                    fft_im[j][fft.bufferSize - k] *= f;
                 }
             }
 
