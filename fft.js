@@ -1,50 +1,54 @@
-function FFT(bufferSize) {
-    this.bufferSize = bufferSize;
-    this.bitReverseTable = new Uint32Array(bufferSize);
-    this.cosTable = new Float32Array(bufferSize / 2);
-    this.sinTable = new Float32Array(bufferSize / 2);
-    this.re = new Float32Array(bufferSize);
-    this.im = new Float32Array(bufferSize);
+function FFT(size) {
+    var half_size = size / 2;
+    this.size = size;
+    this.bit_reverse_table = new Uint32Array(size);
+    this.cos_table = new Float32Array(half_size);
+    this.sin_table = new Float32Array(half_size);
+    this.re = new Float32Array(size);
+    this.im = new Float32Array(size);
 
-    var bits = parseInt(Math.log(bufferSize) * Math.LOG2E + 0.001);
+    var bits = parseInt(Math.log(size) * Math.LOG2E + 0.001);
     var half_bits = parseInt(bits / 2);
 
-    for (var i = 0; i < bufferSize; i++) {
-        var reverseIndex = 0;
+    for (var i = 0; i < size; i++) {
+        var rindex = 0;
         var shift = bits - 1;
 
         for (var b = 0; b <= half_bits; b++) {
-            reverseIndex |= (i >> shift) & (1 << b);
-            reverseIndex |= (i << shift) & ((1 << (bits - 1)) >> b);
+            rindex |= (i >> shift) & (1 << b);
+            rindex |= (i << shift) & ((1 << (bits - 1)) >> b);
 
             shift -= 2;
         }
 
-        this.bitReverseTable[i] = reverseIndex;
+        this.bit_reverse_table[i] = rindex;
     }
 
-    var halfSize = bufferSize >> 1;
-    for (var i = 0; i < halfSize; i++) {
-        this.cosTable[i] = Math.cos(2 * Math.PI * i / bufferSize);
-        this.sinTable[i] = Math.sin(2 * Math.PI * i / bufferSize);
+    for (var i = 0; i < half_size; i++) {
+        var f = 2 * Math.PI * i / size;
+        this.cos_table[i] = Math.cos(f);
+        this.sin_table[i] = Math.sin(f);
     }
 }
 
 FFT.prototype.forward = function(data, stride, stride_offset, re, im) {
-    for (var i = 0; i < this.bufferSize; i++) {
-        this.re[i] = data[this.bitReverseTable[i] * stride + stride_offset];
+    if (stride == undefined) stride = 1;
+    if (stride_offset == undefined) stride_offset = 0;
+
+    for (var i = 0; i < this.size; i++) {
+        this.re[i] = data[this.bit_reverse_table[i] * stride + stride_offset];
         this.im[i] = 0;
     }
     
     for (var depth = 0; ; depth++) {
-        var bcount = this.bufferSize >> (depth + 1);
-        var bgroup = 1 << depth;
+        var b_count = this.size >> (depth + 1);
+        var b_group = 1 << depth;
 
-        for (var j = 0; j < bcount; j++) {
-            var base = bgroup * 2 * j;
+        for (var j = 0; j < b_count; j++) {
+            var base = b_group * 2 * j;
 
-            for (var i = 0; i < bgroup; i++) {
-                var pair = [base + i, base + i + bgroup];
+            for (var i = 0; i < b_group; i++) {
+                var pair = [base + i, base + i + b_group];
 
                 var y_re = this.re[pair[0]];
                 var y_im = this.im[pair[0]];
@@ -52,9 +56,9 @@ FFT.prototype.forward = function(data, stride, stride_offset, re, im) {
                 var z_re = this.re[pair[1]];
                 var z_im = this.im[pair[1]];
 
-                var k = bcount * i;
-                var ck = this.cosTable[k];
-                var sk = this.sinTable[k];
+                var k = b_count * i;
+                var ck = this.cos_table[k];
+                var sk = this.sin_table[k];
 
                 var wz_re = z_re * ck + z_im * sk;
                 var wz_im = z_im * ck - z_re * sk;
@@ -67,21 +71,24 @@ FFT.prototype.forward = function(data, stride, stride_offset, re, im) {
             }
         }
 
-        if (bcount == 1) {
+        if (b_count == 1) {
             break;
         }
     }
 
-    var invN = 1.0 / this.bufferSize;
-    for (var i = 0; i < this.bufferSize; i++) {
-        re[i] = this.re[i] * invN;
-        im[i] = this.im[i] * invN;
+    var inv_size = 1.0 / this.size;
+    for (var i = 0; i < this.size; i++) {
+        re[i] = this.re[i] * inv_size;
+        im[i] = this.im[i] * inv_size;
     }
 }
 
 FFT.prototype.inverse = function(re, im, data, stride, stride_offset) {
-    for (var i = 0; i < this.bufferSize; i++) {
-        var rindex = this.bitReverseTable[i];
+    if (stride == undefined) stride = 1;
+    if (stride_offset == undefined) stride_offset = 0;
+
+    for (var i = 0; i < this.size; i++) {
+        var rindex = this.bit_reverse_table[i];
         
         this.re[i] = re[rindex];
         this.re[rindex] = re[i];
@@ -91,14 +98,14 @@ FFT.prototype.inverse = function(re, im, data, stride, stride_offset) {
     }
 
     for (var depth = 0; ; depth++) {
-        var bcount = this.bufferSize >> (depth + 1);
-        var bgroup = 1 << depth;
+        var b_count = this.size >> (depth + 1);
+        var b_group = 1 << depth;
 
-        for (var j = 0; j < bcount; j++) {
-            var base = bgroup * 2 * j;
+        for (var j = 0; j < b_count; j++) {
+            var base = b_group * 2 * j;
 
-            for (var i = 0; i < bgroup; i++) {
-                var pair = [base + i, base + i + bgroup];
+            for (var i = 0; i < b_group; i++) {
+                var pair = [base + i, base + i + b_group];
 
                 var y_re = this.re[pair[0]];
                 var y_im = this.im[pair[0]];
@@ -106,9 +113,9 @@ FFT.prototype.inverse = function(re, im, data, stride, stride_offset) {
                 var z_re = this.re[pair[1]];
                 var z_im = this.im[pair[1]];
 
-                var k = bcount * i;
-                var ck = this.cosTable[k];
-                var sk = this.sinTable[k];
+                var k = b_count * i;
+                var ck = this.cos_table[k];
+                var sk = this.sin_table[k];
 
                 var wz_re = z_re * ck - z_im * sk;
                 var wz_im = z_im * ck + z_re * sk;
@@ -121,12 +128,12 @@ FFT.prototype.inverse = function(re, im, data, stride, stride_offset) {
             }
         }
 
-        if (bcount == 1) {
+        if (b_count == 1) {
             break;
         }
     }
 
-    for (var i = 0; i < this.bufferSize; i++) {
+    for (var i = 0; i < this.size; i++) {
         data[i * stride + stride_offset] = this.re[i];
     }
 }

@@ -81,12 +81,12 @@ App = function() {
 
                 fft.forward(target_buffers[i], channels, j, fft_re[j], fft_im[j]);
 
-                for (var k = 1; k < fft.bufferSize / 2; k++) {
-                    var f = eq_filter((k - 1) / (fft.bufferSize - 1));
+                for (var k = 1; k < fft.size / 2; k++) {
+                    var f = eq_filter((k - 1) / (fft.size - 1));
                     fft_re[j][k] *= f;
                     fft_im[j][k] *= f;
-                    fft_re[j][fft.bufferSize - k] *= f;
-                    fft_im[j][fft.bufferSize - k] *= f;
+                    fft_re[j][fft.size - k] *= f;
+                    fft_im[j][fft.size - k] *= f;
                 }
             }
 
@@ -151,7 +151,7 @@ App = function() {
         var bar_interval = 1;
         var scale = 100;
 
-        for (var i = 0; i < fft.bufferSize / 2; i += 4) {
+        for (var i = 0; i < fft.size / 2; i += 4) {
             var spectrum = 0;
 
             for (var j = 0; j < channels; j++) {
@@ -168,7 +168,7 @@ App = function() {
             spectrum *= scale;
             magnitude = spectrum * 256;
 
-            var rgb = hsvToRgb(i / (fft.bufferSize / 2), 1, 1);
+            var rgb = hsvToRgb(i / (fft.size / 2), 1, 1);
 
             ctx.fillStyle = "rgb(" + rgb.join(",") + ")";
             ctx.fillRect((bar_width + bar_interval) * i/4, canvas.height, bar_width, -magnitude);
